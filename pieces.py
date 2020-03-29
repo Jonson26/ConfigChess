@@ -36,7 +36,9 @@ class Rook(Piece):
         y = self.y
         t = []
         for i in range(-10, 10):
-            t.append((x + i, y))
+            if(0!=i):
+                t.append((x + i, y))
         for i in range(-10, 10):
-            t.append((x, y + i))
+            if(0!=i):
+                t.append((x, y + i))
         return t
