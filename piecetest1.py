@@ -11,13 +11,17 @@ class BoardApp:
 
         self.frame = Frame(master) #main container frame
         self.frame.pack()
+
+        b1 = Button(text="Knight", command=self.piece1)
+        b2 = Button(text="Rook", command=self.piece2)     
+        b1.pack(side = LEFT)
+        b2.pack(side = LEFT)
+        
         
         self.w = Canvas(self.frame, width=100, height=100)
         self.w.pack(side=BOTTOM)
-
-        self.drawBoard()
-        self.piece1()
         
+        self.drawBoard()        
 
     def drawPiece(self, piece): #draw a peg at the given coordinates with the specified colour
         self.w.create_oval(piece.x*20+1, piece.y*20+1, piece.x*20+19, piece.y*20+19, fill="blue")
@@ -38,7 +42,15 @@ class BoardApp:
             i += 1
     
     def piece1(self):
+        self.drawBoard()
         self.piece = Knight(2, 2, "white")
+        for x in self.piece.getMoveTable():
+            self.drawHighlight(x)
+        self.drawPiece(self.piece)
+        
+    def piece2(self):
+        self.drawBoard()
+        self.piece = Rook(2, 2, "white")
         for x in self.piece.getMoveTable():
             self.drawHighlight(x)
         self.drawPiece(self.piece)
