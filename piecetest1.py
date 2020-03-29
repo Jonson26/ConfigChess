@@ -1,6 +1,9 @@
 from tkinter import *
-import random
+
+from abstract import *
 from pieces import *
+
+import random
 
 class BoardApp:
 
@@ -11,11 +14,14 @@ class BoardApp:
 
         self.frame = Frame(master) #main container frame
         self.frame.pack()
-
-        b1 = Button(text="Knight", command=self.piece1)
-        b2 = Button(text="Rook", command=self.piece2)     
+        
+        f1 = Frame(self.frame)
+        f1.pack(side = TOP)
+        
+        b1 = Button(f1, text="Knight", command=self.piece1)
+        b2 = Button(f1, text="Rook", command=self.piece2)     
         b1.pack(side = LEFT)
-        b2.pack(side = LEFT)
+        b2.pack(side = RIGHT)
         
         
         self.w = Canvas(self.frame, width=100, height=100)
@@ -30,6 +36,7 @@ class BoardApp:
         x = c[0]
         y = c[1]
         self.w.create_rectangle(x*20+1, y*20+1, x*20+19, y*20+19, fill="red", outline = "red")
+        
     def drawBoard(self):
         self.w.create_rectangle(0, 0, 100, 100, fill="white")
         i = 0
@@ -43,14 +50,14 @@ class BoardApp:
     
     def piece1(self):
         self.drawBoard()
-        self.piece = Knight(2, 2, "white")
+        self.piece = Knight(2, 2, "white", Board())
         for x in self.piece.getMoveTable():
             self.drawHighlight(x)
         self.drawPiece(self.piece)
         
     def piece2(self):
         self.drawBoard()
-        self.piece = Rook(2, 2, "white")
+        self.piece = Rook(2, 2, "white", Board())
         for x in self.piece.getMoveTable():
             self.drawHighlight(x)
         self.drawPiece(self.piece)
