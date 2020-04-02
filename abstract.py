@@ -4,9 +4,13 @@ class Piece:
         self.y = y
         self.team = team
         self.board = board
+        self.img = None
     
     def getMoveTable(self):
         return []
+    
+    def getImg(self):
+        return self.img
     
     def move(self, x, y):
         if (x, y) in self.getMoveTable():
