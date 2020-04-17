@@ -1,11 +1,11 @@
 from abstract import Piece
-from tkinter import PhotoImage
+from tkinter import BitmapImage
 
 class Knight(Piece):
     
     def __init__(self, x, y, team, board):
         super().__init__(x, y, team, board)
-        self.img = PhotoImage(file="img/knight.gif")
+        self.img = BitmapImage(file="img/knight.xbm")
     
     def getMoveTable(self):
         x = self.x
@@ -16,7 +16,7 @@ class Rook(Piece):
     
     def __init__(self, x, y, team, board):
         super().__init__(x, y, team, board)
-        self.img = PhotoImage(file="img/rook.gif")    
+        self.img = BitmapImage(file="img/rook.xbm")    
     
     def getMoveTable(self):
         x = self.x
@@ -35,7 +35,7 @@ class Bomb(Piece):
     def __init__(self, x, y, team, board):
         super().__init__(x, y, team, board)   
         self.timer=5
-        self.img = PhotoImage(file="img/bomb"+str(self.timer)+".gif")
+        self.img = BitmapImage(file="img/bomb"+str(self.timer)+".xbm")
     
     def getMoveTable(self):
         x = self.x
@@ -54,8 +54,8 @@ class Bomb(Piece):
         return t
     
     def getImg(self):
-        self.img = PhotoImage(file="img/bomb"+str(self.timer)+".gif")
-        return self.img
+        self.img = BitmapImage(file="img/bomb"+str(self.timer)+".xbm")
+        return super().getImg()
     
     def move(self, x, y):
         self.super().move(x, y)

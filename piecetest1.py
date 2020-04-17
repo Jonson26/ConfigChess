@@ -37,7 +37,8 @@ class BoardApp:
         self.drawBoard()        
 
     def drawPiece(self, piece): #draw a peg at the given coordinates with the specified colour
-        self.w.create_image(piece.x*20+1, piece.y*20+1, anchor=NW, image=piece.getImg())
+        img=piece.getImg()
+        self.w.create_image(piece.x*20+1, piece.y*20+1, anchor=NW, image=img)
         
     def drawHighlight(self, c):
         x = c[0]
