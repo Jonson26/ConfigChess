@@ -58,8 +58,8 @@ class Bomb(Piece):
         return super().getImg()
     
     def move(self, x, y):
-        self.super().move(x, y)
-        timer-=1
-        if(timer==0):
-            self.board.remove(self)
+        super().move(x, y)
+        self.timer-=1
+        if(self.timer==0):
+            self.board.removePiece(self)
         return True

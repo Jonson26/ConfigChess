@@ -25,7 +25,7 @@ class Piece:
         else:
             self.img.config(background=white_tile)
             
-        if(self.team=="white"):
+        if(self.team=="red"):
             self.img.config(foreground=white_piece)
         else:
             self.img.config(foreground=black_piece)
@@ -34,14 +34,18 @@ class Piece:
     def move(self, x, y):
         if (x, y) in self.getMoveTable():
             op = self.board.getPiece(x, y)
-            if(op!=None): #check if there is an other piece on the selected spot
-                if(op.team == self.team): #check team of other piece
-                    return False
-                else:
-                    self.board.removepiece(op)
-                    self.x = x
-                    self.y = y
-                    return True
+            if(op==None): #check if there is an other piece on the selected spot
+                self.x = x
+                self.y = y
+                return True                
+            elif(op.team == self.team): #check team of other piece
+                return False
+            else:
+                self.board.removePiece(op)
+                self.x = x
+                self.y = y
+                return True
+            
             return False
 
 class Board:
@@ -68,12 +72,8 @@ class Board:
     
     def removePiece(self, piece):
         if piece in self.pieces:
-            i = 0
-            while(i<len(self.pieces)):
-                if(self.pieces==piece):
-                    self.pieces.remove(i)
-                    return True
-                i+=1
+            self.pieces.remove(piece)
+            return True
         return False
     
     def getChart(self):
@@ -110,3 +110,12 @@ class Board:
                     t.append(x)
             h = t
             self.hilite = h
+            
+    def countTeams(self):
+        t = {
+            "red": 0,
+            "blue": 0
+        }
+        for p in self.pieces:
+            t[p.team]+=1
+        return t
