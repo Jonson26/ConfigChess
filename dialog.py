@@ -13,7 +13,7 @@ class Dialog:
         f = Frame(root)
         f.pack()
         Label(f, text=text).pack()
-        Button(f, text=button, command=root.quit).pack()
+        Button(f, text=button, command=root.discard).pack()
         root.mainloop()
         
 class BoardEdit:
