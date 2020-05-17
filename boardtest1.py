@@ -11,69 +11,82 @@ class BoardApp:
         self.input_state = False #False: waiting for piece selection; True: waiting for move selection
         self.selected_piece = None
         self.current_palyer="red" #red vs blue
-        master.title("Simple board drawing DEMO")
+        self.move_counter=0
+        self.master.title("Simple board drawing DEMO")       
 
         self.frame = Frame(self.master) #main container frame
         self.frame.pack()
-
-        self.l = Label(self.frame, text=self.current_palyer)
-        self.l.pack()
-        b1 = Button(self.frame, text="generate", command=self.generate)
-        b1.pack()
-        b2 = Button(self.frame, text="edit", command=self.edit)
-        b2.pack()
         
-        self.canvas = Canvas(self.frame, width=320, height=320)        
+        f_top = Frame(self.frame)
+        f_top.pack(side=TOP)
+        
+        self.canvas = Canvas(self.frame, width=320, height=320)
         self.board = Board(self.canvas)
         self.canvas.bind("<Button-1>", self.callback)
-        self.canvas.pack(side=BOTTOM)  
         
-        t = []
-        for x in range(0,8):
-            for y in range(0,8):
-                t.append((x,y))
-        self.board.chart = t
+        for x in range(0, 8):
+            for y in range(0, 8):
+                self.board.chart.append((x, y))
+
+        self.l = Label(f_top, text="Player Data Placeholder")
+        self.l.pack(side=TOP)
+        b2 = Button(f_top, text="Edit Board Shape", command=self.edit1)
+        b2.pack(side=LEFT)
+        b3 = Button(f_top, text="Edit Piece Placement", command=self.edit2)
+        b3.pack(side=LEFT)
+        b4 = Button(f_top, text="Edit Miscellanious Options", command=self.edit3)
+        b4.pack(side=LEFT)
+        b5 = Button(f_top, text="Manage Config", command=self.edit4)
+        b5.pack(side=LEFT)
         
-        self.generate()       
+        self.canvas.pack(side=BOTTOM)
         
-    def edit(self):
-        b = BoardEdit(self.board)
+        self.align(200, 150)
         
-    def generate(self):
-        t = ["red", "blue"]
-        for p in self.board.pieces:
-            self.board.pieces = []
-        for x in range(0,10):
-            x = randint(0,2)
-            if(x==0):
-                p = Knight(randint(0,7), randint(0,7), t[randint(0,1)], self.board)
-            elif(x==1):
-                p = Rook(randint(0,7), randint(0,7), t[randint(0,1)], self.board)
-            elif(x==2):
-                p = Bomb(randint(0,7), randint(0,7), t[randint(0,1)], self.board)
-                p.timer = randint(1,5)
-            self.board.addPiece(p) 
-        self.board.setHighlight(0)
-        self.board.drawBoard(320, 320)
-        self.board.drawPieces()
+        self.redraw(0)
         
+    def align(self, x, y):
+        self.master.geometry("+{}+{}".format(x, y))
+    
+    def edit1(self):
+        x = self.master.winfo_x()
+        y = self.master.winfo_y()
+        BoardEdit(x, y, self.board)
+        
+    def edit2(self):
+        x = self.master.winfo_x()
+        y = self.master.winfo_y()
+        PiecePlaceEdit(x, y, self.board)
+        
+    def edit3(self):
+        x = self.master.winfo_x()
+        y = self.master.winfo_y()
+        MiscEdit(x, y, self.board, (self.l, self.current_palyer, self.move_counter))
+    
+    def edit4(self):
+        x = self.master.winfo_x()
+        y = self.master.winfo_y()
+        ConfigMgr(x, y, self.board)
+    
     def callback(self, event):
         x = event.x//40
         y = event.y//40
-        if(self.input_state):
+        if(self.input_state):#if there is stuff highlighted, try to move, else make a new highlight
             h = self.board.hilite
             if((x, y) in h and (self.board.getPiece(x,y)==None or self.board.getPiece(x,y).team!=self.current_palyer)):
                 self.selected_piece.move(x, y)
-                if(self.current_palyer == "red"):
-                    self.current_palyer = "blue"
+                if(self.move_counter==self.board.movesPerPlayer):
+                    self.move_counter=0
+                    if(self.current_palyer == "red"):
+                        self.current_palyer = "blue"
+                    else:
+                        self.current_palyer = "red"
                 else:
-                    self.current_palyer = "red"
-                self.l.config(text=self.current_palyer)
-                self.l.update()
+                    self.move_counter+=1
             self.redraw(0)
             self.input_state = False
         else:
-            self.selected_piece = self.board.getPiece(x, y)            
+            self.selected_piece = self.board.getPiece(x, y)          
             if(self.selected_piece!=None and self.selected_piece.team == self.current_palyer):
                 self.redraw(self.selected_piece)
                 self.input_state = True
@@ -81,17 +94,21 @@ class BoardApp:
                 self.redraw(0)
                 self.input_state = False
         t = self.board.countTeams()
+        x = self.master.winfo_x()
+        y = self.master.winfo_y()
         if(t["red"]==0 and t["blue"]==0):
-            Dialog(title="GAME OVER", text="Nobody won!", button="Yay?")
+            Dialog(x, y, title="GAME OVER", text="Nobody won!", button="Yay?")
             self.master.quit()
         elif(t["red"]==0):
-            Dialog(title="GAME OVER", text="The blue player won!", button="Yay!")
+            Dialog(x, y, title="GAME OVER", text="The blue player won!", button="Yay!")
             self.master.quit()
         elif(t["blue"]==0):
-            Dialog(title="GAME OVER", text="The red player won!", button="Yay!")
+            Dialog(x, y, title="GAME OVER", text="The red player won!", button="Yay!")
             self.master.quit()
     
     def redraw(self, p):
+        self.l.config(text="Player: "+self.current_palyer+" ("+str(self.move_counter)+"/"+str(self.board.movesPerPlayer+1)+")")
+        self.l.update()        
         self.board.setHighlight(p)
         self.board.drawBoard(320, 320)
         self.board.drawPieces()        

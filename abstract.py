@@ -1,4 +1,5 @@
 from tkinter import NW
+from copy import copy
 
 black_piece = "blue"
 white_piece = "red"
@@ -7,6 +8,7 @@ white_tile = "white"
 
 hilite_color = "green"
 tile_size = 40
+#Board size is 8x8
 
 class Piece:
     def __init__(self, x, y, team, board):
@@ -16,8 +18,34 @@ class Piece:
         self.board = board
         self.img = None
     
+    def reloadImg(self):
+        self.img = None
+    
     def getMoveTable(self):
         return []
+    
+    def genLine(self, delta_i, mul_x, mul_y):
+        x = self.x
+        y = self.y
+        t = []
+        i = 0
+        loop = True
+        while(loop):
+            i += delta_i
+            c = (x+i*mul_x, y+i*mul_y)
+            p = self.board.getPiece(c[0], c[1])
+        
+            if(c in self.board.chart):
+                if(p == None):
+                    t.append(c)                        
+                elif(p.team != self.team):
+                    t.append(c)
+                    loop = False
+                else:
+                    loop = False
+            else:
+                loop = False
+        return t    
     
     def getImg(self):
         if((self.x+self.y)%2==1):
@@ -45,7 +73,6 @@ class Piece:
                 self.x = x
                 self.y = y
                 return True
-            
             return False
 
 class Board:
@@ -53,6 +80,7 @@ class Board:
         self.pieces = []
         self.chart = []
         self.hilite = []
+        self.movesPerPlayer = 0
         self.canvas = canvas
         
     def addPiece(self, piece):
@@ -119,3 +147,21 @@ class Board:
         for p in self.pieces:
             t[p.team]+=1
         return t
+    
+class BoardConfig:
+    def __init__(self, board):
+        self.chart = copy(board.chart)
+        pieces = copy(board.pieces)
+        for p in pieces:
+            p.board = None
+            p.img = None
+        self.pieces = copy(pieces)
+        self.movesPerPlayer = copy(board.movesPerPlayer)
+    
+    def load(self, board):
+        board.chart = copy(self.chart)
+        board.pieces = copy(self.pieces)
+        for p in board.pieces:
+            p.board = board
+            p.reloadImg()
+        board.movesPerPlayer = copy(self.movesPerPlayer)       
