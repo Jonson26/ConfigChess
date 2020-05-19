@@ -34,7 +34,7 @@ class BoardApp:
         b2.pack(side=LEFT)
         b3 = Button(f_top, text="Edit Piece Placement", command=self.edit2)
         b3.pack(side=LEFT)
-        b4 = Button(f_top, text="Edit Miscellanious Options", command=self.edit3)
+        b4 = Button(f_top, text="Edit Miscellaneous Options", command=self.edit3)
         b4.pack(side=LEFT)
         b5 = Button(f_top, text="Manage Config", command=self.edit4)
         b5.pack(side=LEFT)
