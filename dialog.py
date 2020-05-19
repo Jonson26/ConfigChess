@@ -5,7 +5,7 @@ import pickle as pickle
 from pieces import *
 from copy import copy
 
-__piece_types__ = ["Queen", "King", "Rook", "Knight", "Bomb", "Spider", "Bishop"]
+__piece_types__ = ["Queen", "King", "Rook", "Knight", "Bomb", "Spider", "Bishop", "Pawn"]
 __player_colours__ = ["red","blue"]
 
 class Dialog:
@@ -156,6 +156,8 @@ class PiecePlaceEdit(BoardEdit):
                 p=Spider(x, y, c, self.boardA)
             if(t=="Bishop"):
                 p=Bishop(x, y, c, self.boardA)
+            if(t=="Pawn"):
+                p=Pawn(x, y, c, self.boardA)
             if(p!=None):
                 self.boardB.addPiece(p)        
     
@@ -196,7 +198,9 @@ class MiscEdit(Dialog):
         f1 = Frame(self.root)
         f1.pack(side=TOP)
         f2 = Frame(self.root)
-        f2.pack(side=TOP)        
+        f2.pack(side=TOP)   
+        f3 = Frame(self.root)
+        f3.pack(side=TOP)        
         
         b1 = Button(f1, text="SAVE", command=self.save)
         b2 = Button(f1, text="CANCEL", command=self.root.destroy)
@@ -213,26 +217,49 @@ class MiscEdit(Dialog):
         l1.pack(side=LEFT)
         self.e.pack(side=LEFT)
         self.l2.pack(side=BOTTOM)
+
+        l3 = Label(f3, text="Win condition:")
         
-        self.align(x, y)
+        self.c1 = ttk.Combobox(f3, values=["Until one player loses all of his pieces", "Until one of the opponents has no more Kings"], width=50) #menu for win condition selection
+        if(self.board.winCondition == "All"):
+            self.c1.current(0)
+        elif(self.board.winCondition == "King"):
+            self.c1.current(1)
         
-        self.root.mainloop()   
+        l3.pack(side=LEFT)
+        self.c1.pack(side=LEFT)
+        
+        self.v2 = BooleanVar()
+        c = Checkbutton(f3, text="Enable Turn Pass", variable=self.v2)
+        self.v2.set(self.board.passEnable)
+        c.pack(side=BOTTOM)        
+
+        self.align(x, y)        
+        self.root.mainloop()
     
     def save(self):
         try:
             i = int(self.e.get())
             if(i>0):
                 self.board.movesPerPlayer = i-1
-                self.root.destroy()
+                c = self.c1.current()
+                self.board.passEnable = self.v2.get()
                 self.pd[0].config(text="Player: "+self.pd[1]+" ("+str(self.pd[2])+"/"+str(i)+")")
                 self.pd[0].update()
+                self.pd[3].pack_forget()
+                if(self.v2.get()):
+                    self.pd[3].pack(side=BOTTOM)
+                self.root.destroy()
+                if(c==0):
+                    self.board.winCondition = "All"
+                elif(c==1):
+                    self.board.winCondition = "King"
             else:
                 self.l2.configure(text="Error: invalid value! Try again with a different value or give up")
                 self.l2.pack(side=BOTTOM)
         except:
             self.l2.config(text="Error: invalid value! Try again with a different value or give up")
             self.l2.update()
-            
     
 class ConfigMgr(Dialog):
     def __init__(self, x, y, board):

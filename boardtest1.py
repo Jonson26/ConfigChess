@@ -12,7 +12,7 @@ class BoardApp:
         self.selected_piece = None
         self.current_palyer="red" #red vs blue
         self.move_counter=0
-        self.master.title("Simple board drawing DEMO")       
+        self.master.title("ConfigChess - (C)2020 Filip Jamroga")       
 
         self.frame = Frame(self.master) #main container frame
         self.frame.pack()
@@ -39,7 +39,9 @@ class BoardApp:
         b5 = Button(f_top, text="Manage Config", command=self.edit4)
         b5.pack(side=LEFT)
         
-        self.canvas.pack(side=BOTTOM)
+        self.bp = Button(self.frame, text="PASS", command=self.passTurn)
+        self.bp.pack(side=BOTTOM)
+        self.canvas.pack(side=TOP)
         
         self.align(200, 150)
         
@@ -61,7 +63,7 @@ class BoardApp:
     def edit3(self):
         x = self.master.winfo_x()
         y = self.master.winfo_y()
-        MiscEdit(x, y, self.board, (self.l, self.current_palyer, self.move_counter))
+        MiscEdit(x, y, self.board, (self.l, self.current_palyer, self.move_counter, self.bp))
     
     def edit4(self):
         x = self.master.winfo_x()
@@ -93,25 +95,48 @@ class BoardApp:
             else:
                 self.redraw(0)
                 self.input_state = False
-        t = self.board.countTeams()
+        self.testWin()
+        
+    
+    def testWin(self):
         x = self.master.winfo_x()
-        y = self.master.winfo_y()
-        if(t["red"]==0 and t["blue"]==0):
-            Dialog(x, y, title="GAME OVER", text="Nobody won!", button="Yay?")
-            self.master.quit()
-        elif(t["red"]==0):
-            Dialog(x, y, title="GAME OVER", text="The blue player won!", button="Yay!")
-            self.master.quit()
-        elif(t["blue"]==0):
-            Dialog(x, y, title="GAME OVER", text="The red player won!", button="Yay!")
-            self.master.quit()
+        y = self.master.winfo_y()        
+        if(self.board.winCondition == "All"):
+            t = self.board.countTeams()
+            if(t["red"]==0 and t["blue"]==0):
+                Dialog(x, y, title="GAME OVER", text="Nobody won!", button="Yay?")
+                self.master.quit()
+            elif(t["red"]==0):
+                Dialog(x, y, title="GAME OVER", text="The blue player won!", button="Yay!")
+                self.master.quit()
+            elif(t["blue"]==0):
+                Dialog(x, y, title="GAME OVER", text="The red player won!", button="Yay!")
+                self.master.quit()
+        elif(self.board.winCondition == "King"):
+            if(self.board.countPiece(King(None, None, "red", None)) == 0):
+                Dialog(x, y, title="GAME OVER", text="The blue player won!", button="Yay!")
+                self.master.quit()
+            elif(self.board.countPiece(King(None, None, "blue", None)) == 0):
+                Dialog(x, y, title="GAME OVER", text="The red player won!", button="Yay!")
+                self.master.quit()
     
     def redraw(self, p):
         self.l.config(text="Player: "+self.current_palyer+" ("+str(self.move_counter)+"/"+str(self.board.movesPerPlayer+1)+")")
         self.l.update()        
         self.board.setHighlight(p)
         self.board.drawBoard(320, 320)
-        self.board.drawPieces()        
+        self.board.drawPieces()
+        self.bp.pack_forget()
+        if(self.board.passEnable):
+            self.bp.pack(side=BOTTOM)
+    
+    def passTurn(self):
+        self.move_counter=0
+        if(self.current_palyer == "red"):
+            self.current_palyer = "blue"
+        else:
+            self.current_palyer = "red"
+        self.redraw(0)
         
 def board(): #init function - call to start
     root = Tk()

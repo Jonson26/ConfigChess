@@ -141,3 +141,44 @@ class Bishop(Piece):
         t += self.genLine(1, 1, -1)
         return t
     
+class Pawn(Piece):
+    def __init__(self, x, y, team, board):
+        super().__init__(x, y, team, board)
+        self.img = BitmapImage(file="img/pawn.xbm")
+        self.firstturn = True
+    
+    def reloadImg(self):
+        self.img = BitmapImage(file="img/pawn.xbm")
+    
+    def getMoveTable(self):
+        x = self.x
+        y = self.y
+        t = []
+        if(self.team == "red"):
+            if(self.board.getPiece(x, y+1)==None):
+                t.append((x, y+1))
+                if(self.board.getPiece(x, y+2)==None and self.firstturn):
+                    t.append((x, y+2))
+            if(self.board.getPiece(x-1, y+1)!=None):
+                if(self.board.getPiece(x-1, y+1).team != "red"):
+                    t.append((x-1, y+1))
+            if(self.board.getPiece(x+1, y+1)!=None):
+                if(self.board.getPiece(x+1, y+1).team != "red"):
+                    t.append((x+1, y+1))
+        if(self.team == "blue"):
+            if(self.board.getPiece(x, y-1)==None):
+                t.append((x, y-1))
+                if(self.board.getPiece(x, y-2)==None and self.firstturn):
+                    t.append((x, y-2))
+            if(self.board.getPiece(x-1, y-1)!=None):
+                if(self.board.getPiece(x-1, y-1).team != "blue"):
+                    t.append((x-1, y-1))
+            if(self.board.getPiece(x+1, y-1)!=None):
+                if(self.board.getPiece(x+1, y-1).team != "blue"):
+                    t.append((x+1, y-1))
+        return t
+    
+    def move(self, x, y):
+        super().move(x, y)
+        if(self.firstturn):
+            self.firstturn = False

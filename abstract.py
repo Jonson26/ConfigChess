@@ -82,6 +82,8 @@ class Board:
         self.hilite = []
         self.movesPerPlayer = 0
         self.canvas = canvas
+        self.winCondition = "All"
+        self.passEnable = False
         
     def addPiece(self, piece):
         if (piece.x, piece.y) in self.chart:
@@ -148,6 +150,13 @@ class Board:
             t[p.team]+=1
         return t
     
+    def countPiece(self, p):
+        a = 0
+        for x in self.pieces:
+            if(type(x) == type(p) and x.team == p.team):
+                a+=1
+        return a
+    
 class BoardConfig:
     def __init__(self, board):
         self.chart = copy(board.chart)
@@ -157,6 +166,8 @@ class BoardConfig:
             p.img = None
         self.pieces = copy(pieces)
         self.movesPerPlayer = copy(board.movesPerPlayer)
+        self.winCondition = copy(board.winCondition)
+        self.passEnable = copy(board.passEnable)
     
     def load(self, board):
         board.chart = copy(self.chart)
@@ -164,4 +175,6 @@ class BoardConfig:
         for p in board.pieces:
             p.board = board
             p.reloadImg()
-        board.movesPerPlayer = copy(self.movesPerPlayer)       
+        board.movesPerPlayer = copy(self.movesPerPlayer)
+        board.winCondition = copy(self.winCondition)
+        board.passEnable = copy(self.passEnable)
